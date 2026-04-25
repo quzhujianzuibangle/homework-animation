@@ -42,14 +42,38 @@
                     ctx.stroke();
                     ctx.closePath();
                 }//线圆
+
+                tangentpoint(pre_point){
+                    //当前圆方向上的向量
+                    let a1=pre_point.clone().subtract(this.position).normalize().multiplyScalar(this.radius);
+
+                    let angle_1=a1.clone().rotate(Math.PI/2);
+                    let angle_2=a1.clone().rotate(-Math.PI/2);
+
+                    this.p1=this.position.clone().add(angle_1);
+                    this.p2=this.position.clone().add(angle_2);
+
+                    //绘制切点连线
+                    ctx.beginPath();
+                    ctx.arc(this.p1.x,this.p1.y,2,0,Math.PI*2);
+                    ctx.fillStyle="red";
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.arc(this.p2.x,this.p2.y,2,0,Math.PI*2);
+                    ctx.fillStyle="red";
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                //找切点
             }
 
-            let max_length= 30;//最大约束距离；
+            let max_length= 34;//最大约束距离；
 
             //let big_ball=new Ball(mouse_position,max_length);
             //let small_ball=new Ball(mouse_position,8);
 
-            let num_points=15;//约束链节点数量
+            let num_points=12;//约束链节点数量
             let click_mouse=false;//鼠标点击状态
 
             //大圆数组
@@ -58,8 +82,13 @@
             let small_balls=[];
 
             for(var i=0;i<num_points;i++){
+                if(i<=num_points/3){
+                    small_balls.push(new Ball(mouse_position,15+i));
+                }
+                else{
+                    small_balls.push(new Ball(mouse_position,10+num_points-i));
+                }
                 big_balls.push(new Ball(mouse_position,max_length));
-                small_balls.push(new Ball(mouse_position,8));
             }
             //初始化约束链的圆
 
@@ -68,9 +97,26 @@
                    if(click_mouse){
                     big_balls[i].stroke();
                    }     
-                   small_balls[i].fill();
+                   small_balls[i].stroke();
                    if(i>0){
-                    draw_line(small_balls[i].position,small_balls[i-1].position);
+                    draw_line(small_balls[i].position,small_balls[i-1].position); 
+                    small_balls[i].tangentpoint(small_balls[i-1].position);
+                    //绘制切点
+                    ctx.beginPath();
+                    ctx.arc(small_balls[i].p1.x,small_balls[i].p1.y,2,0,Math.PI*2);
+                    ctx.fillStyle="red";
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.arc(small_balls[i].p2.x,small_balls[i].p2.y,2,0,Math.PI*2);
+                    ctx.fillStyle="red";
+                    ctx.fill();
+                    ctx.closePath();
+                    //连前后切点
+                    if(i>1){
+                        draw_line(small_balls[i].p1, small_balls[i-1].p1);
+                        draw_line(small_balls[i].p2, small_balls[i-1].p2);
+                    }
                    }
                }
             }
