@@ -1,7 +1,7 @@
 <!DOCTYPE html>
      <head>
         <title>
-        基础距离约束
+        距离约束链
         </title>
         <script src="victor.min.js">
 
@@ -46,23 +46,45 @@
                 }//线圆
             }
 
-            let max_length= 80;//最大约束距离；
+            let max_length= 30;//最大约束距离；
 
-            let big_ball=new Ball(mouse_position,max_length);
-            let small_ball=new Ball(mouse_position,12);
+            //let big_ball=new Ball(mouse_position,max_length);
+            //let small_ball=new Ball(mouse_position,8);
+
+            let num_points=21;//约束链节点数量
+
+            //大圆数组
+            let big_balls=[];
+            //小圆数组
+            let small_balls=[];
+
+            for(var i=0;i<num_points;i++){
+                big_balls.push(new Ball(mouse_position,max_length));
+                small_balls.push(new Ball(mouse_position,8));
+            }
+            //初始化约束链的圆
 
             function draw(){
-               big_ball.stroke();
-               small_ball.fill();
+               for(var i=0;i<num_points;i++){
+                   big_balls[i].stroke();
+                   small_balls[i].fill();
+               }
             }
             //画的代码
 
             function update(){
-                big_ball.position=mouse_position;
-                var the_distance=mouse_position.clone().subtract(small_ball.position).length();
-                if(the_distance>max_length){
-                    small_ball.position = Constrain_distance(small_ball.position,big_ball.position,max_length);
-                }//如果小球和鼠标的距离大于最大约束距离，就把小球的位置约束在最大约束距离上
+                for(var i=0;i<num_points;i++){
+                    if(i===0){
+                        big_balls[i].position = mouse_position;
+                        small_balls[i].position = mouse_position;
+                    } 
+                    //第一个圆
+                    else {
+                        big_balls[i].position = small_balls[i-1].position;
+                        small_balls[i].position = Constrain_distance(small_balls[i].position,big_balls[i-1].position,max_length);
+                    }
+                    //后续的圆
+                }
             }
             //更新数据
 
