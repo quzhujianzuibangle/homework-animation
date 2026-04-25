@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+     <head>
+        <title>
+        基础距离约束
+        </title>
+        <script src="victor.min.js">
+
+        </script>
+    </head>
+    <body>
+        <canvas id="mycanvas" width=800px height=600px style="background-color:aliceblue;
+        border-style:solid;border-width:1px;border-color:#aaaaaa;">        
+        
+        </canvas>
+        <script>
+            let canvas = document.getElementById("mycanvas");//设定好canvas
+            let ctx = canvas.getContext("2d");//规定ctx在哪，这里是在canvas上
+            
+            
+            let mouse_position= new Victor(canvas.width/2,canvas.height/2);
+            //默认鼠标位置
+            
+            
+            let default_color="#000000";//默认颜色为黑色
+            //圆
+            class  Ball{
+                constructor(position,radius){
+                    this.position=position;
+                    this.radius=radius;
+                    this.color=default_color;
+                }
+                fill(){
+                    ctx.beginPath();
+                    ctx.arc(this.position.x,this.position.y,this.radius,0,Math.PI*2);
+                    ctx.fillStyle=this.color;
+                    ctx.fill();
+                    ctx.closePath();
+                }//填充园
+                stroke(){
+                    ctx.beginPath();
+                    ctx.arc(this.position.x,this.position.y,this.radius,0,Math.PI*2);
+                    ctx.fillStyle=this.color;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+                }//线圆
+            }
+
+            let max_length= 80;//最大约束距离；
+
+            let big_ball=new Ball(mouse_position,max_length);
+            let small_ball=new Ball(mouse_position,12);
+
+            function draw(){
+               big_ball.stroke();
+               small_ball.fill();
+            }
+            //画的代码
+
+            function update(){
+                big_ball.position=mouse_position;
+                var the_distance=mouse_position.clone().subtract(small_ball.position).length();
+                if(the_distance>max_length){
+                    small_ball.position = Constrain_distance(small_ball.position,big_ball.position,max_length);
+                }//如果小球和鼠标的距离大于最大约束距离，就把小球的位置约束在最大约束距离上
+            }
+            //更新数据
+
+            function animation(){
+                ctx.clearRect(0,0,canvas.width,canvas.height);//清除画板上的所有东西
+                update();
+                draw();
+                requestAnimationFrame(animation);
+            }//动画代码，重复画的行为
+
+            canvas.addEventListener('mousemove',function(event){
+                mouse_position = getcanvasmouse_position(event);
+            });//鼠标监听事件
+
+            function getcanvasmouse_position(){
+                const rect=canvas.getBoundingClientRect();
+                const x=event.clientX-rect.left;
+                const y=event.clientY-rect.top;
+                return new Victor(x,y);
+            }
+            //算出鼠标在幕布中的位置
+
+            function Constrain_distance(position_A,position_B,distance){
+                return position_A.clone().subtract(position_B).normalize().multiplyScalar(distance).add(position_B);
+
+            }
+            //约束距离的函数，position_A是被约束的点，position_B是约束点，distance是最大约束距离
+
+
+            animation();
+
+
+        </script>
+    </body>
+</html>
