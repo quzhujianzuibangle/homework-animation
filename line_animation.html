@@ -10,12 +10,10 @@
     <body>
         <canvas id="mycanvas" width=800px height=600px style="background-color:aliceblue;
         border-style:solid;border-width:1px;border-color:#aaaaaa;">        
-        
         </canvas>
         <script>
             let canvas = document.getElementById("mycanvas");//设定好canvas
             let ctx = canvas.getContext("2d");//规定ctx在哪，这里是在canvas上
-            
             
             let mouse_position= new Victor(canvas.width/2,canvas.height/2);
             //默认鼠标位置
@@ -51,7 +49,8 @@
             //let big_ball=new Ball(mouse_position,max_length);
             //let small_ball=new Ball(mouse_position,8);
 
-            let num_points=21;//约束链节点数量
+            let num_points=15;//约束链节点数量
+            let click_mouse=false;//鼠标点击状态
 
             //大圆数组
             let big_balls=[];
@@ -66,7 +65,9 @@
 
             function draw(){
                for(var i=0;i<num_points;i++){
-                   big_balls[i].stroke();
+                   if(click_mouse){
+                    big_balls[i].stroke();
+                   }     
                    small_balls[i].fill();
                }
             }
@@ -80,12 +81,12 @@
                     } 
                     //第一个圆
                     else {
-                        big_balls[i].position = small_balls[i-1].position;
                         small_balls[i].position = Constrain_distance(small_balls[i].position,big_balls[i-1].position,max_length);
+                        big_balls[i].position = small_balls[i].position;
                     }
                     //后续的圆
                 }
-            }
+            }  
             //更新数据
 
             function animation(){
@@ -97,7 +98,16 @@
 
             canvas.addEventListener('mousemove',function(event){
                 mouse_position = getcanvasmouse_position(event);
-            });//鼠标监听事件
+            });
+            //鼠标监听事件
+            
+            canvas.addEventListener('mousedown',function(event){
+                 click_mouse=true;
+            });
+             canvas.addEventListener('mouseup',function(event){
+                 click_mouse=false;
+            });
+            //鼠标点击触发事件
 
             function getcanvasmouse_position(){
                 const rect=canvas.getBoundingClientRect();
@@ -112,6 +122,17 @@
 
             }
             //约束距离的函数，position_A是被约束的点，position_B是约束点，distance是最大约束距离
+            
+            function draw_line(position_A,position_B){
+                ctx.beginPath();
+                ctx.moveTo(position_A.x,position_A.y);
+                ctx.lineTo(position_B.x,position_B.y);
+                ctx.strokeStyle=default_color;
+                ctx.lineWidth = 0.3;
+                ctx.stroke();
+                ctx.closePath();
+            }
+            //画线的函数
 
 
             animation();
