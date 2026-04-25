@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+     <head>
+        <title>
+        动画展示
+        </title>
+    </head>
+    <body>
+        <canvas id="mycanvas" width="400" height="300" style="background-color: aquamarine;">        </canvas>
+        <script>
+            const canvas=document.getElementById('mycanvas');
+            const ctx=canvas.getContext('2d');
+            let x=100;
+            let y=100;
+            let dx =1;//速度
+            let dy =2;
+            let radius=20;
+            function draw(){
+                ctx.beginPath();
+                ctx.arc(x,y,radius,0,Math.PI*2);
+                //ctx.fill();
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                ctx.closePath();
+            }//画的代码
+
+            function animation(){
+                ctx.clearRect(0,0,canvas.width,canvas.height);//清除画板上的所有东西
+                console.log(x+radius);
+                if(x+ radius>canvas.width||x- radius<0){
+                    dx*=-1;
+                }
+                if(y+ radius>canvas.height||y- radius<0){
+                    dy*=-1;
+                }
+                x+=dx;
+                y+=dy;
+                draw();
+                requestAnimationFrame(animation);
+            }//动画代码，重复画的行为
+            
+            animation();
+
+        </script>
+    </body>
+</html>
